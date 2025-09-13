@@ -3,6 +3,7 @@
 	import QuickAddModal from './QuickAddModal.svelte';
 	import PembelianForm from './PembelianForm.svelte';
 	import ExpenseForm from './ExpenseForm.svelte';
+	import { API_BASE_URL } from './apiconfigs.js';
 
 	let activeTab = 'Journal Entries';
 	let fileInput;
@@ -85,7 +86,7 @@
 	}
 
 	async function loadYearOptions() {
-		const res = await fetch('http://localhost:8080/api/akuntansi/years');
+		const res = await fetch(`${API_BASE_URL}/api/akuntansi/years`);
 		const arr = await res.json();
 		years = arr;
 
@@ -96,7 +97,7 @@
 	}
 
 	async function loadMonthOptions() {
-		const res = await fetch(`http://localhost:8080/api/akuntansi/months?year=${selectedYear}`);
+		const res = await fetch(`${API_BASE_URL}/api/akuntansi/months?year=${selectedYear}`);
 		const nums = await res.json();
 		months = nums.map((m) => ({
 			value: String(m).padStart(2, '0'),
@@ -144,7 +145,7 @@
 		const formData = new FormData();
 		formData.append('file', file);
 
-		const res = await fetch('http://localhost:8080/api/xjd/upload', {
+		const res = await fetch (`${API_BASE_URL}/api/xjd/upload`, {
 			method: 'POST',
 			body: formData
 		});
@@ -172,7 +173,7 @@
 		formData.append('file', file);
 
 		try {
-			const res = await fetch('http://localhost:8080/api/transactions', {
+			const res = await fetch(`${API_BASE_URL}/api/transactions`, {
 				method: 'POST',
 				body: formData
 			});
@@ -187,7 +188,7 @@
 			alert('File processed successfully!');
 
 			// untuk download CSV
-			const csvRes = await fetch('http://localhost:8080/api/convert', {
+			const csvRes = await fetch(`${API_BASE_URL}/api/convert`, {
 				method: 'POST',
 				body: formData
 			});
@@ -224,7 +225,7 @@
 
 		try {
 			// 1) Proses ke JSON transaksi
-			const trxRes = await fetch('http://localhost:8080/api/transactions', {
+			const trxRes = await fetch(`${API_BASE_URL}/api/transactions`, {
 				method: 'POST',
 				body: buildFD()
 			});
@@ -233,7 +234,7 @@
 			console.log('Transactions:', transactions);
 
 			// 2) download CSV
-			const csvRes = await fetch('http://localhost:8080/api/convert', {
+			const csvRes = await fetch(`${API_BASE_URL}/api/convert`, {
 				method: 'POST',
 				body: buildFD()
 			});
@@ -252,7 +253,7 @@
 			}
 
 			// 3) Upload & proses jadi Journal Entries
-			const xjdRes = await fetch('http://localhost:8080/api/xjd/upload', {
+			const xjdRes = await fetch(`${API_BASE_URL}/api/xjd/upload`, {
 				method: 'POST',
 				body: buildFD()
 			});
@@ -299,46 +300,46 @@
 
 	async function loadJurnal() {
 		const res = await fetch(
-			`http://localhost:8080/api/akuntansi/journal-entries?year=${selectedYear}&month=${parseInt(selectedMonth)}`
+			`${API_BASE_URL}/api/akuntansi/journal-entries?year=${selectedYear}&month=${parseInt(selectedMonth)}`
 		);
 		journalEntries = await res.json();
 	}
 
 	async function loadAdjustments() {
-		const res = await fetch('http://localhost:8080/api/akuntansi/journal-adjustments');
+		const res = await fetch(`${API_BASE_URL}/api/akuntansi/journal-adjustments`);
 		journalAdjustments = await res.json();
 	}
 
 	async function loadTrialBalance() {
 		const res = await fetch(
-			`http://localhost:8080/api/akuntansi/trial-balance?year=${selectedYear}&month=${parseInt(selectedMonth)}`
+			`${API_BASE_URL}/api/akuntansi/trial-balance?year=${selectedYear}&month=${parseInt(selectedMonth)}`
 		);
 		trialBalance = await res.json();
 	}
 
 	async function loadIncomeStatement() {
 		const res = await fetch(
-			`http://localhost:8080/api/akuntansi/income-statement?year=${selectedYear}&month=${parseInt(selectedMonth)}`
+			`${API_BASE_URL}/api/akuntansi/income-statement?year=${selectedYear}&month=${parseInt(selectedMonth)}`
 		);
 		incomeStatement = await res.json();
 	}
 
 	async function loadBalanceSheet() {
 		const res = await fetch(
-			`http://localhost:8080/api/akuntansi/balance-sheet?year=${selectedYear}&month=${parseInt(selectedMonth)}`
+			`${API_BASE_URL}/api/akuntansi/balance-sheet?year=${selectedYear}&month=${parseInt(selectedMonth)}`
 		);
 		balanceSheet = await res.json();
 	}
 
 	async function loadCOGS() {
 		const res = await fetch(
-			`http://localhost:8080/api/akuntansi/cogs?year=${selectedYear}&month=${parseInt(selectedMonth)}`
+			`${API_BASE_URL}/api/akuntansi/cogs?year=${selectedYear}&month=${parseInt(selectedMonth)}`
 		);
 		cogs = await res.json();
 	}
 
 	async function loadInventoryCalc() {
-		const res = await fetch('http://localhost:8080/api/akuntansi/inventory-calculation');
+		const res = await fetch(`${API_BASE_URL}/api/akuntansi/inventory-calculation`);
 		inventoryCalc = await res.json();
 	}
 

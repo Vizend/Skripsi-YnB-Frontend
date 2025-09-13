@@ -6,6 +6,7 @@
 	import DetailMasukModal from './DetailMasukModal.svelte';
 	import DetailMasukContent from './DetailMasukContent.svelte';
 	import { getBarang, updateBarang, deleteBarang } from '../api/barangAPI.js';
+	import { API_BASE_URL } from '../api/apiconfigs';
 
 	let showModal = false;
 	let uploadMode = ''; // "manual" atau "csv"
@@ -110,7 +111,7 @@
 		const ok = confirm(`Yakin menghapus ${selectedCount} produk terpilih?`);
 		if (!ok) return;
 
-		const res = await fetch('http://localhost:8080/api/barang/bulk-delete', {
+		const res = await fetch(`${API_BASE_URL}/api/barang/bulk-delete`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ kode_list: Array.from(selectedCodes) })
@@ -136,7 +137,7 @@
 			// Tambah async fetch untuk harga beli FIFO
 			products = await Promise.all(
 				data.map(async (p) => {
-					const res = await fetch(`http://localhost:8080/api/barang/${p.kode_barang}/fifo-harga`);
+					const res = await fetch(`${API_BASE_URL}/api/barang/${p.kode_barang}/fifo-harga`);
 					const { harga_beli } = await res.json();
 
 					return {
@@ -156,7 +157,7 @@
 
 	async function refreshBarangMasukList() {
 		if (!selectedKode) return;
-		const res = await fetch(`http://localhost:8080/api/barang/${selectedKode}/masuk`);
+		const res = await fetch(`${API_BASE_URL}/api/barang/${selectedKode}/masuk`);
 		barangMasukList = await res.json();
 	}
 
@@ -164,7 +165,7 @@
 		selectedKode = kode;
 		showDetailModal = true;
 
-		const res = await fetch(`http://localhost:8080/api/barang/${kode}/masuk`);
+		const res = await fetch(`${API_BASE_URL}/api/barang/${kode}/masuk`);
 		barangMasukList = await res.json();
 		await refreshBarangMasukList();
 	}
@@ -195,7 +196,7 @@
 	async function handleAddProduct(data) {
 		console.log('Sending data to backend:', JSON.stringify(data, null, 2));
 		try {
-			const res = await fetch('http://localhost:8080/api/barang/manual', {
+			const res = await fetch(`${API_BASE_URL}/api/barang/manual`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify(data)
@@ -265,7 +266,7 @@
 	}
 
 	async function lihatDetail(kode) {
-		const res = await fetch(`http://localhost:8080/api/barang/${kode}/detail-masuk`);
+		const res = await fetch(`${API_BASE_URL}/api/barang/${kode}/detail-masuk`);
 		const detail = await res.json();
 		alert(JSON.stringify(detail, null, 2)); // bisa ganti dengan modal
 	}

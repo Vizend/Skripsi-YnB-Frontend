@@ -1,8 +1,9 @@
 <script>
 	import { onMount } from 'svelte';
 	import ApexRaw from './ApexRaw.svelte';
+	import { API_BASE_URL } from '../api/apiconfigs';
 
-	const API = 'http://localhost:8080';
+	const API = API_BASE_URL;
 
 	let selectedYear = new Date().getFullYear();
 	let selectedMonth = String(new Date().getMonth() + 1).padStart(2, '0');

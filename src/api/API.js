@@ -33,11 +33,11 @@ export async function request(
 	if (body) {
 		options.body = isFormData ? body : JSON.stringify(body);
 	}
-	console.log('[API REQUEST]', method, BASE_URL + path, options);
+	console.log('[API REQUEST]', method, API_BASE_URL + path, options);
 
 	let res;
 	try {
-		res = await fetch(BASE_URL + path, options);
+		res = await fetch(API_BASE_URL + path, options);
 	} catch (e) {
 		// benar-benar gagal jaringan / CORS
 		throw { message: 'Tidak bisa terhubung ke server', code: 0 };
