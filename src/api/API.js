@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { API_BASE_URL } from './apiconfigs.js';
 
-export const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+// export const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 export const defaultHeaders = {
 	'Content-Type': 'application/json'
