@@ -3,7 +3,7 @@
 	import QuickAddModal from './QuickAddModal.svelte';
 	import PembelianForm from './PembelianForm.svelte';
 	import ExpenseForm from './ExpenseForm.svelte';
-	import { API_BASE_URL } from './apiconfigs.js';
+	import { API_BASE_URL } from '../api/apiconfigs';
 
 	let activeTab = 'Journal Entries';
 	let fileInput;
