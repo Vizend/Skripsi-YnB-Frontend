@@ -15,6 +15,7 @@
 	let showManualForm = false;
 	let showCSVForm = false;
 	let showUploadResultModal = false;
+	let showExportModal = false;
 
 	let search = '';
 	let selectedProduct = null;
@@ -50,6 +51,25 @@
 			filteredProducts.length > 0 &&
 			filteredProducts.every((p) => selectedCodes.has(p.kode_barang));
 		if (selectAll !== allSelected) selectAll = allSelected;
+	}
+
+	// pilihan kolom export
+	const exportChoices = [
+		{ key: 'kode_barang', label: 'Kode Barang' },
+		{ key: 'nama_barang', label: 'Nama Barang' },
+		{ key: 'harga_jual', label: 'Harga Jual' },
+		{ key: 'harga_beli', label: 'Harga Beli' },
+		{ key: 'quantity', label: 'Quantity (stok tersisa)' },
+		{ key: 'value', label: 'Value (nilai persediaan)' }
+	];
+	let selectedExport = new Set(['kode_barang', 'nama_barang', 'quantity', 'value']);
+	let includeArchived = false;
+
+	function toggleExportChoice(key) {
+		const s = new Set(selectedExport);
+		if (s.has(key)) s.delete(key);
+		else s.add(key);
+		selectedExport = s;
 	}
 
 	function handleTouchStart(event) {
@@ -170,6 +190,37 @@
 		await refreshBarangMasukList();
 	}
 
+	async function doExportCSV() {
+		if (selectedExport.size === 0) {
+			alert('Pilih minimal satu kolom.');
+			return;
+		}
+		const body = {
+			columns: Array.from(selectedExport),
+			include_archived: includeArchived
+		};
+		const resp = await fetch(`${API_BASE_URL}/api/barang/export-csv`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(body)
+		});
+		if (!resp.ok) {
+			const t = await resp.text();
+			alert('Export gagal: ' + t);
+			return;
+		}
+		const blob = await resp.blob();
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement('a');
+		a.href = url;
+		a.download = 'barang_export.csv';
+		document.body.appendChild(a);
+		a.click();
+		a.remove();
+		URL.revokeObjectURL(url);
+		showExportModal = false;
+	}
+
 	function handleSearch() {
 		const keyword = search.toLowerCase();
 		filteredProducts = products.filter(
@@ -279,6 +330,13 @@
 		<div class="mb-4 flex items-center justify-between">
 			<h2 class="text-xl font-bold text-gray-800">Inventory</h2>
 			<div class="flex gap-2">
+				<button
+					class="rounded bg-emerald-600 px-4 py-2 text-white"
+					on:click={() => (showExportModal = true)}
+					title="Export CSV"
+				>
+					Export
+				</button>
 				<button
 					class="rounded px-4 py-2 text-white"
 					class:bg-blue-500={!isEditMode}
@@ -483,6 +541,36 @@
 			await fetchProducts(); //refresh table
 		}}
 	/>
+</Modal>
+
+<Modal show={showExportModal} onClose={() => (showExportModal = false)}>
+	<h3 class="mb-3 text-lg font-bold">Export Barang ke CSV</h3>
+	<div class="mb-3 text-sm text-gray-600">Pilih kolom yang ingin diekspor:</div>
+	<div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
+		{#each exportChoices as ch}
+			<label class="flex items-center gap-2">
+				<input
+					type="checkbox"
+					checked={selectedExport.has(ch.key)}
+					on:change={() => toggleExportChoice(ch.key)}
+				/>
+				<span>{ch.label}</span>
+			</label>
+		{/each}
+	</div>
+	<div class="mt-3 flex items-center gap-2">
+		<input id="arch" type="checkbox" bind:checked={includeArchived} />
+		<label for="arch" class="text-sm">Sertakan barang yang diarsipkan</label>
+	</div>
+
+	<div class="mt-4 flex justify-end gap-2">
+		<button class="rounded border px-4 py-2" on:click={() => (showExportModal = false)}
+			>Batal</button
+		>
+		<button class="rounded bg-emerald-600 px-4 py-2 text-white" on:click={doExportCSV}>
+			Export CSV
+		</button>
+	</div>
 </Modal>
 
 <style>

@@ -14,7 +14,7 @@
 
 	const tabs = [
 		'Journal Entries',
-		'Journal Adjustments',
+		// 'Journal Adjustments',
 		'Trial Balance',
 		'Income Statement',
 		'Balance Sheet',
@@ -41,22 +41,6 @@
 	let selectedMonth = (new Date().getMonth() + 1).toString().padStart(2, '0');
 
 	let showExpenseForm = false;
-
-	// const years = [2023, 2024, 2025];
-	// const months = [
-	// 	{ value: '01', label: 'Januari' },
-	// 	{ value: '02', label: 'Februari' },
-	// 	{ value: '03', label: 'Maret' },
-	// 	{ value: '04', label: 'April' },
-	// 	{ value: '05', label: 'Mei' },
-	// 	{ value: '06', label: 'Juni' },
-	// 	{ value: '07', label: 'Juli' },
-	// 	{ value: '08', label: 'Agustus' },
-	// 	{ value: '09', label: 'September' },
-	// 	{ value: '10', label: 'Oktober' },
-	// 	{ value: '11', label: 'November' },
-	// 	{ value: '12', label: 'Desember' }
-	// ];
 
 	let years = [];
 	let months = [];
@@ -497,17 +481,15 @@
 		</div>
 
 		<!-- Journal Adjustments -->
-	{:else if activeTab === 'Journal Adjustments'}
+	<!-- {:else if activeTab === 'Journal Adjustments'}
 		<div>
 			<h3 class="mb-2 text-lg font-semibold">Journal Adjustments</h3>
-			<!-- Isi jurnal penyesuaian -->
-			<!-- <p class="text-gray-600">Form dan tabel jurnal penyesuaian di sini.</p> -->
 			<ul class="list-disc pl-6 text-sm text-gray-700">
 				{#each journalAdjustments as adj}
 					<li>{adj.date} - {adj.account}: {adj.adjustment} ({adj.description})</li>
 				{/each}
 			</ul>
-		</div>
+		</div> -->
 
 		<!-- Trial Balance -->
 	{:else if activeTab === 'Trial Balance'}

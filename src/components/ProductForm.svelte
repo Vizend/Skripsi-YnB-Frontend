@@ -16,6 +16,9 @@
 	let success = '';
 	let loading = false;
 
+	// flag edit
+	$: isEdit = !!initial;
+
 	// Isi form jika sedang edit
 	$: if (initial) {
 		kode = initial.kode_barang || '';
@@ -42,11 +45,13 @@
 			return;
 		}
 
+		const purchaseToSend = isEdit ? parseFloat(purchase) || 0 : purchase ? parseFloat(purchase) : 0;
+
 		const data = {
 			kode_barang: kode.trim(),
 			name: name.trim(),
 			selling: parseFloat(selling),
-			purchase: purchase ? parseFloat(purchase) : 0,
+			purchase: purchaseToSend,
 			stock: parseInt(stock)
 		};
 
@@ -89,9 +94,15 @@
 		<input
 			bind:value={purchase}
 			type="number"
-			placeholder="Harga Beli"
+			placeholder={isEdit ? 'Tidak bisa diubah di sini' : 'Harga Beli'}
 			class="w-full rounded border p-2"
+			disabled={isEdit}
 		/>
+		{#if isEdit}
+			<div class="mt-1 text-xs text-gray-500">
+				Harga beli mengikuti batch pembelian/FIFO. Ubah dari modul Pembelian/Barang Masuk.
+			</div>
+		{/if}
 	</div>
 
 	<div>

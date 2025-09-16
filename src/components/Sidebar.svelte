@@ -14,8 +14,8 @@
 		{ icon: '/icon/accounting.svg', name: 'Accounting' },
 		{ icon: '/icon/inventory.svg', name: 'Inventory' },
 		{ icon: '/icon/users.svg', name: 'Users' },
-		{ icon: '/icon/users.svg', name: 'Edit Profile' },
-		{ icon: '/icon/settings.svg', name: 'Settings' }
+		{ icon: '/icon/users.svg', name: 'Edit Profile' }
+		// { icon: '/icon/settings.svg', name: 'Settings' }
 	];
 
 	onMount(() => {
@@ -39,9 +39,13 @@
 			case 'owner':
 				return fullMenu;
 			case 'inventory':
-				return fullMenu.filter((item) => ['Dashboard', 'Inventory'].includes(item.name));
+				return fullMenu.filter((item) =>
+					['Dashboard', 'Inventory', 'Accounting', 'Edit Profile'].includes(item.name)
+				);
 			case 'finance':
-				return fullMenu.filter((item) => ['Dashboard', 'Accounting'].includes(item.name));
+				return fullMenu.filter((item) =>
+					['Dashboard', 'Inventory', 'Accounting', 'Edit Profile'].includes(item.name)
+				);
 			default:
 				return [{ icon: '/icon/dashboard.svg', name: 'Dashboard' }];
 		}
@@ -49,8 +53,8 @@
 
 	// Fungsi logout
 	function logout() {
-		localStorage.clear(); // Atau: localStorage.removeItem('your-key') jika spesifik
-		window.location.href = '/login'; // Ganti sesuai path login kamu
+		localStorage.clear();
+		window.location.href = '/login';
 	}
 </script>
 
