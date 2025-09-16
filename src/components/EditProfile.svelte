@@ -1,5 +1,6 @@
 <script>
 	import { onMount } from 'svelte';
+	import { API_BASE_URL } from '../api/apiconfigs';
 
 	let user = {
 		id: '',
@@ -49,7 +50,7 @@
 
 		loading = true;
 		try {
-			const res = await fetch(`http://localhost:8080/api/users/${user.id}/profile`, {
+			const res = await fetch(`${API_BASE_URL}/api/users/${user.id}/profile`, {
 				method: 'PUT',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify(user)
@@ -80,7 +81,7 @@
 
 		loading = true;
 		try {
-			const res = await fetch(`http://localhost:8080/api/users/${user.id}/change-password`, {
+			const res = await fetch(`${API_BASE_URL}/api/users/${user.id}/change-password`, {
 				method: 'PUT',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({

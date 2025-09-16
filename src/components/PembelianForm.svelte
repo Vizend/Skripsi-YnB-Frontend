@@ -1,5 +1,6 @@
 <script>
 	import { createEventDispatcher } from 'svelte';
+	import { API_BASE_URL } from '../api/apiconfigs';
 
 	// ── State form
 	let tanggal = new Date().toISOString().split('T')[0];
@@ -51,7 +52,7 @@
 
 		isLoading = true;
 		try {
-			const url = new URL('http://localhost:8080/api/barang/prefill');
+			const url = new URL(`${API_BASE_URL}/api/barang/prefill`);
 			url.searchParams.set('kode', kode_barang);
 			if (useFIFO) url.searchParams.set('prefer', 'fifo');
 
@@ -84,7 +85,7 @@
 			return;
 		}
 		try {
-			const res = await fetch(`http://localhost:8080/api/barang/search?q=${encodeURIComponent(q)}`);
+			const res = await fetch(`${API_BASE_URL}/api/barang/search?q=${encodeURIComponent(q)}`);
 			if (!res.ok) return;
 			suggestions = await res.json();
 			showDropdown = suggestions.length > 0;
@@ -167,7 +168,7 @@
 		};
 
 		try {
-			const res = await fetch('http://localhost:8080/api/pembelian/manual', {
+			const res = await fetch(`${API_BASE_URL}/api/pembelian/manual`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify(body)

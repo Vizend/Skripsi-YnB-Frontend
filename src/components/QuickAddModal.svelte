@@ -2,6 +2,7 @@
 	import PembelianForm from './PembelianForm.svelte';
 	import ExpenseForm from './ExpenseForm.svelte';
 	import EquityForm from './EquityForm.svelte';
+	import { API_BASE_URL } from '../api/apiconfigs';
 
 	export let open = false;
 	export let onClose = () => {};
@@ -41,10 +42,10 @@
 
 		try {
 			// 1) JSON transaksi
-			await fetch('http://localhost:8080/api/transactions', { method: 'POST', body: buildFD() });
+			await fetch(`${API_BASE_URL}/api/transactions`, { method: 'POST', body: buildFD() });
 
 			// 2) Download CSV
-			const csvRes = await fetch('http://localhost:8080/api/convert', {
+			const csvRes = await fetch(`${API_BASE_URL}/api/convert`, {
 				method: 'POST',
 				body: buildFD()
 			});
@@ -61,7 +62,7 @@
 			}
 
 			// 3) Upload XJD => Jurnal
-			const xjdRes = await fetch('http://localhost:8080/api/xjd/upload', {
+			const xjdRes = await fetch(`${API_BASE_URL}/api/xjd/upload`, {
 				method: 'POST',
 				body: buildFD()
 			});

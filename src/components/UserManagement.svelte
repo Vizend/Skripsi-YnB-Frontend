@@ -1,6 +1,8 @@
 <script>
 	import { onMount } from 'svelte';
+	import { API_BASE_URL } from '../api/apiconfigs';
 	import { fade, scale } from 'svelte/transition';
+	
 
 	let searchQuery = '';
 	let users = [];
@@ -43,7 +45,7 @@
 	async function loadUsers() {
 		try {
 			isLoading = true;
-			const res = await fetch('http://localhost:8080/api/users');
+			const res = await fetch(`${API_BASE_URL}/api/users`);
 			const data = await res.json();
 			users = [...data];
 		} catch (e) {
@@ -55,7 +57,7 @@
 
 	async function loadRoles() {
 		try {
-			const res = await fetch('http://localhost:8080/api/roles');
+			const res = await fetch(`${API_BASE_URL}/api/roles`);
 			const data = await res.json();
 			roles = data;
 		} catch (err) {
@@ -88,7 +90,7 @@
 		if (!confirm(`Yakin ingin menghapus user ${user.full_name}?`)) return;
 		try {
 			deletingId = user.id;
-			const res = await fetch(`http://localhost:8080/api/users/${user.id}`, {
+			const res = await fetch(`${API_BASE_URL}/api/users/${user.id}`, {
 				method: 'DELETE'
 			});
 			const result = await res.json();
@@ -121,8 +123,8 @@
 		}
 
 		const url = editingUserId
-			? `http://localhost:8080/api/users/${editingUserId}`
-			: 'http://localhost:8080/api/users';
+			? `${API_BASE_URL}/api/users/${editingUserId}`
+			: `${API_BASE_URL}/api/users`;
 		const method = editingUserId ? 'PUT' : 'POST';
 
 		try {

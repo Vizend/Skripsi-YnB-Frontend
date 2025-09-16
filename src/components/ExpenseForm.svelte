@@ -18,7 +18,7 @@
 		}
 		isSubmitting = true;
 		try {
-			const res = await fetch('http://localhost:8080/api/akuntansi/expenses', {
+			const res = await fetch(`${API_BASE_URL}/api/akuntansi/expenses`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ tanggal, kategori, metode, jumlah, keterangan })

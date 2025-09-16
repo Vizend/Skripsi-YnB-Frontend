@@ -3,6 +3,7 @@
 	import { createEventDispatcher } from 'svelte';
 	export let list = [];
 	export let kodeBarang = '';
+	import { API_BASE_URL } from '../api/apiconfigs';
 	// export let onEdit = () => {};
 
 	const dispatch = createEventDispatcher();
@@ -20,7 +21,7 @@
 	async function saveEdit() {
 		loading = true;
 
-		const res = await fetch(`http://localhost:8080/api/barang-masuk/${editingId}`, {
+		const res = await fetch(`${API_BASE_URL}/api/barang-masuk/${editingId}`, {
 			method: 'PUT',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify(editData)

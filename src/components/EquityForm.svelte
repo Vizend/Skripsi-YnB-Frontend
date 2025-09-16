@@ -1,5 +1,6 @@
 <script>
 	import { createEventDispatcher } from 'svelte';
+	import { API_BASE_URL } from '../api/apiconfigs';
 	const dispatch = createEventDispatcher();
 
 	let tanggal = new Date().toISOString().slice(0, 10);
@@ -17,7 +18,7 @@
 		}
 		isSubmitting = true;
 		try {
-			const res = await fetch('http://localhost:8080/api/akuntansi/equity', {
+			const res = await fetch(`${API_BASE_URL}/api/akuntansi/equity`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ tanggal, tipe, metode, jumlah, keterangan })
