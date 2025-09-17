@@ -117,9 +117,6 @@
 						{#if loading}Memproses…{:else if cooldown > 0}Coba lagi dalam {cooldown}s{:else}Log In{/if}
 					</button>
 
-					<p class="text-center text-xs text-slate-500">
-						Dengan masuk, Anda menyetujui syarat & kebijakan yang berlaku.
-					</p>
 				</form>
 			</div>
 		</div>
