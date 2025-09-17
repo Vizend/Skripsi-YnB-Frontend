@@ -11,6 +11,8 @@
 	let previewData = null; // { transactions: [...] }
 	let previewOpen = false;
 	let previewFile = null;
+	let hasDuplicate = false;
+	let missingCount = 0;
 
 	// state tampilan isi modal
 	let mode = 'menu'; // "menu" | "pembelian" | "beban" | "equity" | "txt"
@@ -26,6 +28,15 @@
 	$: if (!open && mode !== 'menu') {
 		mode = 'menu';
 		isProcessing = false;
+	}
+
+	$: {
+		const txs = previewData?.transactions ?? [];
+		hasDuplicate = txs.some((t) => t.duplicate);
+		missingCount = txs.reduce(
+			(sum, t) => sum + (t.items?.filter?.((it) => !it.barang_id)?.length || 0),
+			0
+		);
 	}
 
 	function closeAndReset() {
@@ -46,7 +57,10 @@
 		previewFile = file;
 
 		try {
-			const pvRes = await fetch(`${API_BASE_URL}/api/xjd/preview`, { method: 'POST', body: buildFD(file) });
+			const pvRes = await fetch(`${API_BASE_URL}/api/xjd/preview`, {
+				method: 'POST',
+				body: buildFD(file)
+			});
 			if (!pvRes.ok) throw new Error('Preview gagal');
 			previewData = await pvRes.json();
 			previewOpen = true;
@@ -238,6 +252,15 @@
 				>
 			</div>
 
+			{#if hasDuplicate || missingCount}
+				<div class="mb-3 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+					{#if hasDuplicate}• Ada transaksi <b>duplikat</b> (tanggal + RefNo). Perbaiki RefNo pada
+						TXT terlebih dulu.<br />{/if}
+					{#if missingCount}• Ada <b>{missingCount}</b> item yang <b>tidak ditemukan</b> di master barang.
+						Tambah/mapping dulu barangnya.{/if}
+				</div>
+			{/if}
+
 			<div class="max-h-[60vh] overflow-auto text-sm">
 				{#each previewData?.transactions ?? [] as t, idx}
 					<div class="mb-4 rounded-lg border p-3">
@@ -303,10 +326,17 @@
 					>Batal</button
 				>
 				<button
-					class="rounded bg-indigo-600 px-4 py-1.5 text-white hover:bg-indigo-700"
+					class="rounded bg-indigo-600 px-4 py-1.5 text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
 					on:click={commitTxt}
+					disabled={isProcessing || hasDuplicate || missingCount > 0}
 				>
-					Commit ke Jurnal
+					{#if hasDuplicate}
+						Perbaiki RefNo Duplikat
+					{:else if missingCount > 0}
+						Perbaiki {missingCount} Item
+					{:else}
+						Commit ke Jurnal
+					{/if}
 				</button>
 			</div>
 		</div>
