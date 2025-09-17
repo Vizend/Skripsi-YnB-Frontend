@@ -49,14 +49,14 @@
 						case 'value':
 							row._value = parseFloat(value) || 0; // simpan sementara
 							break;
-						case 'harga_beli':
-							row.harga_beli = parseFloat(value) || 0;
-							break;
+						// case 'harga_beli':
+						// 	row.harga_beli = parseFloat(value) || 0;
+						// 	break;
 					}
 				});
 
 				// Default kosong
-				row.harga_beli = row.harga_beli ?? 0;
+				// row.harga_beli = row.harga_beli ?? 0;
 
 				// Hitung harga_jual dari value/quantity * 100
 				if (row.jumlah_stock > 0 && row._value > 0) {
@@ -66,6 +66,8 @@
 				}
 				delete row._value; // buang supaya tidak ikut terkirim
 
+				// harga beli = 90% dari harga jual
+				row.harga_beli = Math.round(row.harga_jual * 0.9);
 
 				return row;
 			});
@@ -122,7 +124,6 @@
 						<th class="border px-2">Harga Jual</th>
 						<th class="border px-2">Harga Beli</th>
 						<th class="border px-2">Stok</th>
-
 					</tr>
 				</thead>
 				<tbody>

@@ -110,8 +110,9 @@
 		<input
 			bind:value={stock}
 			type="number"
-			placeholder="Jumlah Stok"
+			placeholder={isEdit ? 'Tidak bisa diubah di sini' : 'Jumlah Stok'}
 			class="w-full rounded border p-2"
+			disabled={isEdit}
 		/>
 	</div>
 

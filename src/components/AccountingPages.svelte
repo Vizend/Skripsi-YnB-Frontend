@@ -129,7 +129,7 @@
 		const formData = new FormData();
 		formData.append('file', file);
 
-		const res = await fetch (`${API_BASE_URL}/api/xjd/upload`, {
+		const res = await fetch(`${API_BASE_URL}/api/xjd/upload`, {
 			method: 'POST',
 			body: formData
 		});
@@ -323,8 +323,65 @@
 	}
 
 	async function loadInventoryCalc() {
-		const res = await fetch(`${API_BASE_URL}/api/akuntansi/inventory-calculation`);
+		const res = await fetch(
+			`${API_BASE_URL}/api/akuntansi/inventory-calculation?year=${selectedYear}&month=${parseInt(selectedMonth)}`
+		);
 		inventoryCalc = await res.json();
+	}
+
+	async function downloadFile(url, filename) {
+		const res = await fetch(url);
+		if (!res.ok) {
+			const t = await res.text().catch(() => '');
+			alert('Export gagal: ' + (t || res.status));
+			return;
+		}
+		const blob = await res.blob();
+		const urlObj = URL.createObjectURL(blob);
+		const a = document.createElement('a');
+		a.href = urlObj;
+		a.download = filename;
+		document.body.appendChild(a);
+		a.click();
+		a.remove();
+		URL.revokeObjectURL(urlObj);
+	}
+
+	function ymQS() {
+		return `year=${selectedYear}&month=${parseInt(selectedMonth)}`;
+	}
+
+	function exportXLSX(kind) {
+		const qs = `year=${selectedYear}&month=${parseInt(selectedMonth)}`;
+		let path = '',
+			fname = '';
+		switch (kind) {
+			case 'journal':
+				path = 'journal-entries.xlsx';
+				fname = `journal_${selectedYear}_${selectedMonth}.xlsx`;
+				break;
+			case 'tb':
+				path = 'trial-balance.xlsx';
+				fname = `trial_balance_${selectedYear}_${selectedMonth}.xlsx`;
+				break;
+			case 'is':
+				path = 'income-statement.xlsx';
+				fname = `income_statement_${selectedYear}_${selectedMonth}.xlsx`;
+				break;
+			case 'bs':
+				path = 'balance-sheet.xlsx';
+				fname = `balance_sheet_${selectedYear}_${selectedMonth}.xlsx`;
+				break;
+			case 'cogs':
+				path = 'cogs.xlsx';
+				fname = `cogs_${selectedYear}_${selectedMonth}.xlsx`;
+				break;
+			case 'invcalc':
+				path = 'inventory-calculation.xlsx';
+				fname = `inventory_calc_${selectedYear}_${selectedMonth}.xlsx`;
+				break;
+		}
+		downloadFile(`${API_BASE_URL}/api/akuntansi/${path}?${qs}`, fname);
 	}
 
 	onMount(async () => {
@@ -379,6 +436,12 @@
 					on:click={() => (showForm = true)}
 					>Form Pembelian
 				</button> -->
+				<button
+					class="rounded bg-emerald-600 px-4 py-1.5 text-white hover:bg-emerald-700"
+					on:click={() => exportXLSX('journal')}
+					>Export XLSX
+				</button>
+
 				<button
 					class="rounded bg-indigo-600 px-4 py-1.5 text-white hover:bg-indigo-700"
 					on:click={() => (showQuickAdd = true)}
@@ -481,7 +544,7 @@
 		</div>
 
 		<!-- Journal Adjustments -->
-	<!-- {:else if activeTab === 'Journal Adjustments'}
+		<!-- {:else if activeTab === 'Journal Adjustments'}
 		<div>
 			<h3 class="mb-2 text-lg font-semibold">Journal Adjustments</h3>
 			<ul class="list-disc pl-6 text-sm text-gray-700">
@@ -524,6 +587,12 @@
 					</select>
 				</div>
 			</div>
+
+			<button
+				class="mb-3 rounded bg-emerald-600 px-4 py-1.5 text-white hover:bg-emerald-700"
+				on:click={() => exportXLSX('tb')}
+				>Export XLSX
+			</button>
 
 			<div class="overflow-auto rounded-lg border border-gray-300 shadow-sm">
 				<table class="min-w-full text-sm">
@@ -585,6 +654,12 @@
 					</select>
 				</div>
 			</div>
+
+			<button
+				class="mb-3 rounded bg-emerald-600 px-4 py-1.5 text-white hover:bg-emerald-700"
+				on:click={() => exportXLSX('is')}
+				>Export XLSX
+			</button>
 
 			<div class="overflow-auto rounded-lg border border-gray-300 shadow-sm">
 				<table class="min-w-full text-sm">
@@ -654,6 +729,12 @@
 				</div>
 			</div>
 
+			<button
+				class="mb-3 rounded bg-emerald-600 px-4 py-1.5 text-white hover:bg-emerald-700"
+				on:click={() => exportXLSX('bs')}
+				>Export XLSX
+			</button>
+
 			<div class="overflow-auto rounded-lg border border-gray-300 shadow-sm">
 				<table class="min-w-full text-sm">
 					<thead class="bg-gray-100 text-left font-medium text-gray-700">
@@ -719,6 +800,12 @@
 				</div>
 			</div>
 
+			<button
+				class="mb-3 rounded bg-emerald-600 px-4 py-1.5 text-white hover:bg-emerald-700"
+				on:click={() => exportXLSX('cogs')}
+				>Export XLSX
+			</button>
+
 			<div
 				class="w-full max-w-md rounded-lg border border-gray-300 bg-white p-4 text-sm text-gray-700 shadow-sm"
 			>
@@ -750,6 +837,42 @@
 	{:else if activeTab === 'Inventory Calculation'}
 		<div>
 			<h3 class="mb-4 text-lg font-semibold text-gray-800">Inventory Calculation</h3>
+			<div class="mb-4 flex flex-wrap items-center gap-4 text-sm">
+				<div class="flex flex-col">
+					<label for="year" class="mb-1 font-medium text-gray-700">Tahun</label>
+					<select
+						id="year"
+						bind:value={selectedYear}
+						on:change={() => onYearChange(loadInventoryCalc)}
+						class="appearance-none rounded-lg border border-gray-300 px-3 py-2 pr-10 shadow-sm focus:ring-2 focus:ring-blue-400 focus:outline-none"
+					>
+						{#each years as y}
+							<option value={y}>{y}</option>
+						{/each}
+					</select>
+				</div>
+
+				<div class="flex flex-col">
+					<label for="month" class="mb-1 font-medium text-gray-700">Bulan</label>
+					<select
+						id="month"
+						bind:value={selectedMonth}
+						on:change={loadInventoryCalc}
+						class="rounded-lg border border-gray-300 px-3 py-2 pr-8 shadow-sm focus:ring-2 focus:ring-blue-400 focus:outline-none"
+					>
+						{#each months as m}
+							<option value={m.value}>{m.label}</option>
+						{/each}
+					</select>
+				</div>
+			</div>
+
+			<button
+				class="mb-3 rounded bg-emerald-600 px-4 py-1.5 text-white hover:bg-emerald-700"
+				on:click={() => exportXLSX('invcalc')}
+				>Export XLSX
+			</button>
+
 			<div class="overflow-auto rounded-lg border border-gray-300 shadow-sm">
 				<table class="min-w-full text-sm">
 					<thead class="bg-gray-100 text-left font-medium text-gray-700">
