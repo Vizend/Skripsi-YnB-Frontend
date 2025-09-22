@@ -2,7 +2,6 @@
 	import { onMount } from 'svelte';
 	import { API_BASE_URL } from '../api/apiconfigs';
 	import { fade, scale } from 'svelte/transition';
-	
 
 	let searchQuery = '';
 	let users = [];
@@ -27,6 +26,9 @@
 		role_id: '',
 		tanggal_lahir: ''
 	};
+	let usernameTaken = false;
+	let emailTaken = false;
+	let debounceTimer;
 
 	$: filtered = users
 		.filter(
@@ -140,6 +142,12 @@
 				showModal = false;
 				resetForm();
 				await loadUsers();
+			} else if (res.status === 409) {
+				// backend kirim { error: "...", fields: { username?: "...", email?: "..." } }
+				errors = { ...errors, ...(result.fields || {}) };
+				// tandai field-nya supaya pesan tampil
+				if (result.fields?.username) touched.username = true;
+				if (result.fields?.email) touched.email = true;
 			} else {
 				alert(result.error || 'Gagal menyimpan user.');
 			}
@@ -196,6 +204,31 @@
 		if (r.includes('staff') || r.includes('user'))
 			return 'bg-blue-50 text-blue-700 ring-1 ring-blue-200';
 		return 'bg-gray-50 text-gray-700 ring-1 ring-gray-200';
+	}
+
+	function debounce(fn, wait = 300) {
+		clearTimeout(debounceTimer);
+		debounceTimer = setTimeout(fn, wait);
+	}
+
+	async function checkAvailability() {
+		const qs = new URLSearchParams();
+		if (newUser.username) qs.set('username', newUser.username.trim());
+		if (newUser.email) qs.set('email', newUser.email.trim());
+		if (editingUserId) qs.set('excludeId', editingUserId);
+
+		const res = await fetch(`${API_BASE_URL}/api/users/check?` + qs.toString());
+		const data = await res.json();
+		usernameTaken = !!data.username_taken;
+		emailTaken = !!data.email_taken;
+
+		if (usernameTaken) errors.username = 'Username sudah digunakan';
+		else if (touched.username && !newUser.username.trim()) errors.username = 'Username wajib diisi';
+		else delete errors.username;
+
+		if (emailTaken) errors.email = 'Email sudah digunakan';
+		else if (touched.email && !newUser.email.trim()) errors.email = 'Email wajib diisi';
+		else delete errors.email;
 	}
 </script>
 
@@ -383,7 +416,10 @@
 								? 'border-red-500'
 								: 'border-gray-300'}"
 							bind:value={newUser.username}
-							on:blur={() => (touched.username = true)}
+							on:blur={() => {
+								touched.username = true;
+								debounce(checkAvailability);
+							}}
 						/>
 						{#if errors.username && touched.username}
 							<p class="mt-1 text-xs text-red-600">{errors.username}</p>
@@ -401,7 +437,10 @@
 								? 'border-red-500'
 								: 'border-gray-300'}"
 							bind:value={newUser.email}
-							on:blur={() => (touched.email = true)}
+							on:blur={() => {
+								touched.email = true;
+								debounce(checkAvailability);
+							}}
 						/>
 						{#if errors.email && touched.email}
 							<p class="mt-1 text-xs text-red-600">{errors.email}</p>
@@ -494,7 +533,7 @@
 					<button
 						class="rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-blue-700 focus:ring-4 focus:ring-blue-200 focus:outline-none disabled:opacity-60"
 						on:click={saveUser}
-						disabled={isSaving}
+						disabled={isSaving || usernameTaken || emailTaken}
 					>
 						{isSaving ? 'Menyimpan…' : editingUserId ? 'Update' : 'Create'}
 					</button>

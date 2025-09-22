@@ -100,17 +100,29 @@
 		await reloadFn();
 	}
 
+	// function formatTanggal(iso) {
+	// 	if (!iso) return '';
+	// 	const d = new Date(iso);
+	// 	if (isNaN(d.getTime())) return 'Tanggal tidak valid';
+
+	// 	return new Intl.DateTimeFormat('id-ID', {
+	// 		day: '2-digit',
+	// 		month: 'long',
+	// 		year: 'numeric',
+	// 		timeZone: 'Asia/Jakarta'
+	// 	}).format(d);
+	// }
+
 	function formatTanggal(iso) {
 		if (!iso) return '';
-		const d = new Date(iso);
-		if (isNaN(d.getTime())) return 'Tanggal tidak valid';
-
+		const dateOnly = iso.slice(0, 10); // "YYYY-MM-DD"
+		const [y, m, d] = dateOnly.split('-').map(Number);
+		const dObj = new Date(y, m - 1, d); // tanggal lokal tanpa konversi UTC
 		return new Intl.DateTimeFormat('id-ID', {
 			day: '2-digit',
 			month: 'long',
-			year: 'numeric',
-			timeZone: 'Asia/Jakarta'
-		}).format(d);
+			year: 'numeric'
+		}).format(dObj);
 	}
 
 	async function refreshAfterExpense() {
@@ -382,6 +394,11 @@
 				break;
 		}
 		downloadFile(`${API_BASE_URL}/api/akuntansi/${path}?${qs}`, fname);
+	}
+
+	function fmtRupiah(n) {
+		const s = Math.abs(n).toLocaleString('id-ID');
+		return n < 0 ? `(Rp ${s})` : `Rp ${s}`;
 	}
 
 	onMount(async () => {
@@ -749,7 +766,7 @@
 							<tr>
 								<td class="p-3">{row.type}</td>
 								<td class="p-3">{row.name}</td>
-								<td class="p-3">Rp {row.amount.toLocaleString()}</td>
+								<td class="p-3">{fmtRupiah(row.amount)}</td>
 							</tr>
 						{/each}
 						<tr class="bg-gray-50 font-semibold text-blue-800">

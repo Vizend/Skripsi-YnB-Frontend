@@ -60,7 +60,7 @@
 
 				// Hitung harga_jual dari value/quantity * 100
 				if (row.jumlah_stock > 0 && row._value > 0) {
-					row.harga_jual = (row._value / row.jumlah_stock) * 1000;
+					row.harga_jual = (row._value / row.jumlah_stock) * 1;
 				} else {
 					row.harga_jual = 0;
 				}

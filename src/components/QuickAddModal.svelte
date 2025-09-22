@@ -75,25 +75,25 @@
 	async function commitTxt() {
 		if (!previewFile) return;
 
-		// 1) JSON transaksi
-		await fetch(`${API_BASE_URL}/api/transactions`, { method: 'POST', body: buildFD(previewFile) });
+		// // 1) JSON transaksi
+		// await fetch(`${API_BASE_URL}/api/transactions`, { method: 'POST', body: buildFD(previewFile) });
 
-		// 2) Download CSV
-		const csvRes = await fetch(`${API_BASE_URL}/api/convert`, {
-			method: 'POST',
-			body: buildFD(previewFile)
-		});
-		if (csvRes.ok) {
-			const blob = await csvRes.blob();
-			const url = URL.createObjectURL(blob);
-			const a = document.createElement('a');
-			a.href = url;
-			a.download = 'transactions.csv';
-			document.body.appendChild(a);
-			a.click();
-			a.remove();
-			URL.revokeObjectURL(url);
-		}
+		// // 2) Download CSV
+		// const csvRes = await fetch(`${API_BASE_URL}/api/convert`, {
+		// 	method: 'POST',
+		// 	body: buildFD(previewFile)
+		// });
+		// if (csvRes.ok) {
+		// 	const blob = await csvRes.blob();
+		// 	const url = URL.createObjectURL(blob);
+		// 	const a = document.createElement('a');
+		// 	a.href = url;
+		// 	a.download = 'transactions.csv';
+		// 	document.body.appendChild(a);
+		// 	a.click();
+		// 	a.remove();
+		// 	URL.revokeObjectURL(url);
+		// }
 
 		// commit ke jurnal
 		const resp = await fetch(`${API_BASE_URL}/api/xjd/upload`, {

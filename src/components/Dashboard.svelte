@@ -24,8 +24,49 @@
 	let topProducts = []; // [{name, qty}]
 	let inoutTrend = []; // [{month, inQty, outQty}]
 
+	let years = [];
+	let months = [];
+
 	const mLabel = (m) => new Date(2000, m - 1, 1).toLocaleString('id-ID', { month: 'short' });
 	const fmt = (n) => (Number(n) || 0).toLocaleString('id-ID');
+
+	function monthLabel(y, m) {
+		// ubah dari hasil angka menjadi string bulan
+		return new Date(y, m - 1, 1).toLocaleString('id-ID', { month: 'long' });
+	}
+
+	async function loadYearOptions() {
+		const res = await fetch(`${API_BASE_URL}/api/akuntansi/years`);
+		const arr = await res.json();
+		years = arr;
+
+		console.log('Years:', years);
+
+		// set default jika selectedYear belum ada di list
+		if (!years.includes(+selectedYear)) {
+			selectedYear = years[0];
+		}
+	}
+
+	async function loadMonthOptions() {
+		const res = await fetch(`${API_BASE_URL}/api/akuntansi/months?year=${selectedYear}`);
+		const nums = await res.json();
+		months = nums.map((m) => ({
+			value: String(m).padStart(2, '0'),
+			label: monthLabel(selectedYear, m)
+		}));
+
+		// jaga-jaga: kalau selectedMonth tidak ada di list, pilih yang pertama
+		if (!months.find((x) => x.value === selectedMonth)) {
+			selectedMonth = months[0]?.value ?? '01';
+		}
+	}
+
+	// agar saat user ganti tahun, bulan ikut refresh & data reload
+	async function onYearChange(reloadFn) {
+		await loadMonthOptions();
+		await reloadFn();
+	}
 
 	async function loadAll() {
 		const [s, t, e, p, io] = await Promise.all([
@@ -50,7 +91,11 @@
 		console.log({ summary, t, e, p, io });
 	}
 
-	onMount(loadAll);
+	onMount(async () => {
+		await loadAll();
+		await loadYearOptions();
+		await loadMonthOptions();
+	});
 </script>
 
 <div class="min-h-screen bg-gray-100 p-6">
@@ -68,7 +113,7 @@
 						on:change={loadAll}
 						class="w-[110px] appearance-none rounded-lg border border-gray-300 bg-white px-3 py-2 pr-8 text-sm shadow-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
 					>
-						{#each Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - i) as y}
+						{#each years as y}
 							<option value={y}>{y}</option>
 						{/each}
 					</select>
@@ -87,10 +132,8 @@
 						on:change={loadAll}
 						class="w-40 appearance-none rounded-lg border border-gray-300 bg-white px-3 py-2 pr-8 text-sm shadow-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
 					>
-						{#each Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, '0')) as m}
-							<option value={m}>
-								{new Date(2000, +m - 1, 1).toLocaleString('id-ID', { month: 'long' })}
-							</option>
+						{#each months as m}
+							<option value={m.value}>{m.label}</option>
 						{/each}
 					</select>
 				</div>

@@ -1,11 +1,13 @@
 <script>
 	import { createEventDispatcher } from 'svelte';
+	import { API_BASE_URL } from '../api/apiconfigs';
+	
 
 	const dispatch = createEventDispatcher();
 
 	let tanggal = new Date().toISOString().slice(0, 10);
 	let kategori = 'gaji'; // gaji | listrik | transport
-	let metode = 'kas'; // kas | bank | utang
+	let metode = 'kas'; // kas | bank
 	let jumlah = 0;
 	let keterangan = '';
 
@@ -66,7 +68,6 @@
 				>
 					<option value="kas">Kas</option>
 					<option value="bank">Bank</option>
-					<option value="utang">Utang Usaha (akrual)</option>
 				</select>
 			</div>
 		</div>

@@ -1,4 +1,8 @@
+
+
 <script>
+
+	//tidak dipakai
 	export let show = false;
 	export let onClose = () => {};
 	export let kodeBarang = '';

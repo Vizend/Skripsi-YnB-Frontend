@@ -3,7 +3,7 @@
 	import Modal from './Modal.svelte';
 	import UploadBarang from './UploadBarang.svelte';
 	import ProductForm from './ProductForm.svelte';
-	import DetailMasukModal from './DetailMasukModal.svelte';
+	// import DetailMasukModal from './DetailMasukModal.svelte';
 	import DetailMasukContent from './DetailMasukContent.svelte';
 	import { getBarang, updateBarang, deleteBarang } from '../api/barangAPI.js';
 	import { API_BASE_URL } from '../api/apiconfigs';
@@ -446,7 +446,7 @@
 <!-- Pilihan metode input -->
 <Modal show={showMainModal} onClose={() => (showMainModal = false)}>
 	<h3 class="mb-4 text-lg font-bold">Pilih metode input</h3>
-	<button
+	<!-- <button
 		class="mb-2 w-full rounded bg-green-500 p-2 text-white"
 		on:click={() => {
 			showManualForm = true;
@@ -454,7 +454,7 @@
 		}}
 	>
 		Input Manual
-	</button>
+	</button> -->
 	<button
 		class="w-full bg-blue-600 p-2 text-white"
 		on:click={() => {
