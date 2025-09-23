@@ -234,7 +234,7 @@
 
 <!-- Container -->
 <div
-	class="flex h-full flex-col rounded-xl bg-white/60 p-5 shadow ring-1 ring-gray-100 backdrop-blur"
+	class="flex h-full flex-col rounded-xl bg-white/60 p-5 shadow ring-1 ring-gray-100"
 >
 	<!-- Header -->
 	<div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
