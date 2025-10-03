@@ -23,8 +23,31 @@
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ tanggal, tipe, metode, jumlah, keterangan })
 			});
-			const data = await res.json();
-			if (!res.ok) throw new Error(data?.message || 'Gagal simpan equity');
+
+			// baca body sekali → coba JSON, kalau gagal pakai text kosong
+			let data = null;
+			try {
+				data = await res.json();
+			} catch {
+				data = {};
+			}
+
+			if (!res.ok) {
+				const msg = data?.message || 'Gagal menyimpan';
+				// tangkap guard “saldo tidak cukup” dari backend
+				if (res.status === 400 && /saldo/i.test(msg)) {
+					const saran = data?.saran || '';
+					const saldo = fmtIDR(data?.saldo);
+					const kurang = fmtIDR(data?.kurang);
+					alert(`${msg}\nSaldo: Rp ${saldo}\nKurang: Rp ${kurang}\n${saran}`);
+				} else {
+					alert(msg);
+				}
+				return; 
+			}
+
+			// const data = await res.json();
+			// if (!res.ok) throw new Error(data?.message || 'Gagal simpan equity');
 			alert('Transaksi Ekuitas tersimpan');
 			dispatch('success');
 		} catch (e) {
@@ -88,4 +111,4 @@
 	>
 		{isSubmitting ? 'Menyimpan...' : 'Simpan'}
 	</button>
-</div>  
+</div>

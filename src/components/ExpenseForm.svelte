@@ -1,7 +1,6 @@
 <script>
 	import { createEventDispatcher } from 'svelte';
 	import { API_BASE_URL } from '../api/apiconfigs';
-	
 
 	const dispatch = createEventDispatcher();
 
@@ -12,6 +11,8 @@
 	let keterangan = '';
 
 	let isSubmitting = false;
+
+	const fmtIDR = (n) => (Number(n) || 0).toLocaleString('id-ID');
 
 	async function submit() {
 		if (jumlah <= 0) {
@@ -25,8 +26,33 @@
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ tanggal, kategori, metode, jumlah, keterangan })
 			});
-			const data = await res.json();
-			if (!res.ok) throw new Error(data?.message || 'Gagal simpan beban');
+
+			// baca body sekali (coba JSON, kalau gagal pakai objek kosong)
+			let data = null;
+			try {
+				data = await res.json();
+			} catch {
+				data = {};
+			}
+
+			if (!res.ok) {
+				const msg = data?.message || 'Gagal simpan beban';
+
+				// tangkap error guard saldo dari backend (status 400, pesan berisi "saldo")
+				if (res.status === 400 && /saldo/i.test(msg)) {
+					const saldo = fmtIDR(data?.saldo);
+					const kurang = fmtIDR(data?.kurang);
+					const saran = data?.saran || '';
+					alert(`${msg}\nSaldo: Rp ${saldo}\nKurang: Rp ${kurang}\n${saran}`);
+
+				} else {
+					alert(msg);
+				}
+				return; // stop saat error
+			}
+
+			// const data = await res.json();
+			// if (!res.ok) throw new Error(data?.message || 'Gagal simpan beban');
 			alert('Beban tersimpan');
 			dispatch('success');
 		} catch (e) {
